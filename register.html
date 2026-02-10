@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 500px;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .user-type-card {
+            flex: 1;
+            padding: 20px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            background: var(--white);
+        }
+        
+        .user-type-card:hover {
+            border-color: var(--primary-light);
+            background: rgba(0, 119, 182, 0.02);
+        }
+        
+        .user-type-card.selected {
+            border-color: var(--primary-color);
+            background: rgba(0, 119, 182, 0.05);
+            box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+        }
+        
+        .user-type-card input {
+            display: none;
+        }
+        
+        .user-type-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .user-type-card h4 {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-type-card p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--medium-gray);
+            background: var(--off-white);
+            border: 2px solid var(--light-gray);
+            transition: all var(--transition-normal);
+        }
+        
+        .step.active {
+            background: var(--primary-gradient);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .step.completed {
+            background: var(--secondary-color);
+            color: var(--white);
+            border-color: var(--secondary-color);
+        }
+        
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: var(--light-gray);
+            margin: 0 10px;
+        }
+        
+        .step-line.active {
+            background: var(--secondary-color);
+        }
+        
+        .password-strength {
+            margin-top: 10px;
+        }
+        
+        .strength-bar {
+            height: 4px;
+            background: var(--light-gray);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .strength-bar-fill {
+            height: 100%;
+            width: 0;
+            transition: all var(--transition-normal);
+            border-radius: 2px;
+        }
+        
+        .strength-bar-fill.weak { width: 25%; background: var(--error-color); }
+        .strength-bar-fill.fair { width: 50%; background: var(--warning-color); }
+        .strength-bar-fill.good { width: 75%; background: var(--info-color); }
+        .strength-bar-fill.strong { width: 100%; background: var(--success-color); }
+        
+        .strength-text {
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .terms-checkbox input {
+            margin-top: 3px;
+        }
+        
+        .terms-checkbox label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .terms-checkbox a {
+            color: var(--primary-color);
+        }
+        
+        .form-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .toggle-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--light-gray);
+            background: var(--white);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-weight: 500;
+        }
+        
+        .toggle-btn.active {
+            background: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .login-benefits {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: var(--radius-md);
+            margin-top: 25px;
+        }
+        
+        .login-benefits h4 {
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+        
+        .login-benefits ul {
+            list-style: none;
+        }
+        
+        .login-benefits li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+        
+        .login-benefits li i {
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div style="margin-bottom: 15px;">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="60" height="60" rx="15" fill="rgba(255,255,255,0.2)"/>
+                        <path d="M30 15C23 15 18 20 18 27C18 34 23 39 30 39C37 39 42 34 42 27C42 20 37 15 30 15Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M30 24V33M25.5 30H34.5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1>Create Account</h1>
+                <p>Join MedVault for better healthcare management</p>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" style="margin-bottom: 20px;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step-line" id="line1"></div>
+                    <div class="step" id="step2">2</div>
+                    <div class="step-line" id="line2"></div>
+                    <div class="step" id="step3">3</div>
+                </div>
+                
+                <form id="registerForm" method="POST">
+                    <input type="hidden" name="action" value="send_otp">
+                    
+                    <!-- Step 1: Account Type Selection -->
+                    <div id="step1Content">
+                        <h4 style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">
+                            Select Your Account Type
+                        </h4>
+                        
+                        <div class="user-type-selector">
+                            <label class="user-type-card" onclick="selectUserType('patient', this)">
+                                <input type="radio" name="user_type" value="patient" checked>
+                                <i class="fas fa-user"></i>
+                                <h4>Patient</h4>
+                                <p>Manage your health records</p>
+                            </label>
+                            <label class="user-type-card" onclick="selectUserType('doctor', this)">
+                                <input type="radio" name="user_type" value="doctor">
+                                <i class="fas fa-user-md"></i>
+                                <h4>Doctor</h4>
+                                <p>Manage patients & appointments</p>
+                            </label>
+                            <label class="user-type-card" onclick="selectUserType('hospital', this)">
+                                <input type="radio" name="user_type" value="hospital">
+                                <i class="fas fa-hospital"></i>
+                                <h4>Hospital</h4>
+                                <p>Hospital administration</p>
+                            </label>
+                        </div>
+                        
+                        <button type="button" class="btn btn-primary btn-block" onclick="nextStep(2)">
+                            <i class="fas fa-arrow-right"></i> Continue
+                        </button>
+                    </div>
+                    
+                    <!-- Step 2: Account Details -->
+                    <div id="step2Content" style="display: none;">
+                        <h4 style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">
+                            Account Details
+                        </h4>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-envelope" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light);"></i>
+                                <input type="email" 
+                                       class="form-control" 
+                                       name="email" 
+                                       placeholder="Enter your email"
+                                       id="emailInput"
+                                       required
+                                       style="padding-left: 45px;">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light);"></i>
+                                <input type="password" 
+                                       class="form-control" 
+                                       name="password" 
+                                       placeholder="Create a strong password"
+                                       id="passwordInput"
+                                       required
+                                       style="padding-left: 45px;">
+                                <i class="fas fa-eye toggle-password" 
+                                   style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); cursor: pointer;"
+                                   onclick="togglePassword('passwordInput', this)"></i>
+                            </div>
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="strength-bar-fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Password strength</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Confirm Password</label>
+                            <div style="position: relative;">
+                                <i class="fas fa-lock" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light);"></i>
+                                <input type="password" 
+                                       class="form-control" 
+                                       name="confirm_password" 
+                                       placeholder="Confirm your password"
+                                       id="confirmPasswordInput"
+                                       required
+                                       style="padding-left: 45px;">
+                                <i class="fas fa-eye toggle-password" 
+                                   style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-light); cursor: pointer;"
+                                   onclick="togglePassword('confirmPasswordInput', this)"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="terms-checkbox">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">
+                                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary btn-block" onclick="nextStep(3)">
+                            <i class="fas fa-arrow-right"></i> Continue
+                        </button>
+                        
+                        <button type="button" class="btn btn-outline btn-block" style="margin-top: 10px;" onclick="prevStep(1)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    
+                    <!-- Step 3: Verification -->
+                    <div id="step3Content" style="display: none;">
+                        <h4 style="text-align: center; margin-bottom: 20px; color: var(--text-dark);">
+                            Verify Your Email
+                        </h4>
+                        
+                        <p style="text-align: center; color: var(--text-light); margin-bottom: 25px;">
+                            We'll send a verification code to your email address.
+                        </p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="verifyEmailDisplay" 
+                                   readonly
+                                   style="background: var(--off-white);">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-paper-plane"></i> Send Verification Code
+                        </button>
+                        
+                        <button type="button" class="btn btn-outline btn-block" style="margin-top: 10px;" onclick="prevStep(2)">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="login-benefits">
+                    <h4><i class="fas fa-shield-alt" style="color: var(--primary-color);"></i> Why Register?</h4>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Secure & encrypted health records</li>
+                        <li><i class="fas fa-check"></i> Easy appointment booking</li>
+                        <li><i class="fas fa-check"></i> 24/7 access to your medical history</li>
+                        <li><i class="fas fa-check"></i> Share records securely with doctors</li>
+                    </ul>
+                </div>
+                
+                <p style="text-align: center; color: var(--text-light); margin-top: 20px;">
+                    Already have an account? 
+                    <a href="{{ url_for('login') }}" style="color: var(--primary-color); font-weight: 600;">Login here</a>
+                </p>
+            </div>
+        </div>
+        
+        <!-- Back to Home -->
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="{{ url_for('welcome') }}" style="color: var(--text-light);">
+                <i class="fas fa-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let selectedUserType = 'patient';
+        
+        function selectUserType(type, element) {
+            selectedUserType = type;
+            document.querySelectorAll('.user-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+        
+        function nextStep(step) {
+            if (step === 2) {
+                // Validate step 1
+                if (!selectedUserType) {
+                    alert('Please select an account type.');
+                    return;
+                }
+            }
+            
+            if (step === 3) {
+                // Validate step 2
+                const email = document.getElementById('emailInput').value;
+                const password = document.getElementById('passwordInput').value;
+                const confirmPassword = document.getElementById('confirmPasswordInput').value;
+                const terms = document.getElementById('terms').checked;
+                
+                if (!email || !password || !confirmPassword) {
+                    alert('Please fill in all fields.');
+                    return;
+                }
+                
+                if (password.length < 8) {
+                    alert('Password must be at least 8 characters.');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                
+                if (!terms) {
+                    alert('Please accept the Terms of Service.');
+                    return;
+                }
+                
+                document.getElementById('verifyEmailDisplay').value = email;
+            }
+            
+            // Hide all steps
+            document.getElementById('step1Content').style.display = 'none';
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'none';
+            
+            // Show current step
+            document.getElementById('step' + step + 'Content').style.display = 'block';
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById('step' + i);
+                stepEl.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepEl.classList.add('completed');
+                    stepEl.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === step) {
+                    stepEl.classList.add('active');
+                    stepEl.innerHTML = i;
+                } else {
+                    stepEl.innerHTML = i;
+                }
+            }
+            
+            // Update lines
+            if (step > 1) {
+                document.getElementById('line1').classList.add('active');
+            }
+            if (step > 2) {
+                document.getElementById('line2').classList.add('active');
+            }
+            
+            currentStep = step;
+        }
+        
+        function prevStep(step) {
+            // Hide all steps
+            document.getElementById('step1Content').style.display = 'none';
+            document.getElementById('step2Content').style.display = 'none';
+            document.getElementById('step3Content').style.display = 'none';
+            
+            // Show previous step
+            document.getElementById('step' + step + 'Content').style.display = 'block';
+            
+            // Update step indicators
+            for (let i = 1; i <= 3; i++) {
+                const stepEl = document.getElementById('step' + i);
+                stepEl.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepEl.classList.add('completed');
+                    stepEl.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === step) {
+                    stepEl.classList.add('active');
+                    stepEl.innerHTML = i;
+                } else {
+                    stepEl.innerHTML = i;
+                }
+            }
+            
+            // Update lines
+            if (step <= 2) {
+                document.getElementById('line1').classList.remove('active');
+            }
+            if (step <= 3) {
+                document.getElementById('line2').classList.remove('active');
+            }
+            
+            currentStep = step;
+        }
+        
+        function togglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Password strength checker
+        document.getElementById('passwordInput').addEventListener('input', function() {
+            const password = this.value;
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.length >= 12) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^a-zA-Z0-9]/.test(password)) strength++;
+            
+            strengthFill.className = 'strength-bar-fill';
+            if (strength <= 1) {
+                strengthFill.classList.add('weak');
+                strengthText.textContent = 'Weak';
+                strengthText.style.color = 'var(--error-color)';
+            } else if (strength <= 2) {
+                strengthFill.classList.add('fair');
+                strengthText.textContent = 'Fair';
+                strengthText.style.color = 'var(--warning-color)';
+            } else if (strength <= 3) {
+                strengthFill.classList.add('good');
+                strengthText.textContent = 'Good';
+                strengthText.style.color = 'var(--info-color)';
+            } else {
+                strengthFill.classList.add('strong');
+                strengthText.textContent = 'Strong';
+                strengthText.style.color = 'var(--success-color)';
+            }
+        });
+    </script>
+</body>
+</html>
+

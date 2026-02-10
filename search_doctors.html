@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Doctors - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .search-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .search-hero {
+            background: var(--primary-gradient);
+            padding: 60px 40px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 40px;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .search-hero h1 {
+            color: var(--white);
+            margin-bottom: 15px;
+        }
+        
+        .search-hero p {
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        
+        .search-input-group {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .search-input-group input {
+            width: 100%;
+            padding: 18px 20px 18px 50px;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .search-box .btn {
+            padding: 18px 40px;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .results-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .results-header h2 i {
+            color: var(--primary-color);
+        }
+        
+        .results-count {
+            padding: 8px 15px;
+            background: var(--off-white);
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .doctor-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+        
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .doctor-header {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        
+        .doctor-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--white);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .doctor-info h3 {
+            margin-bottom: 5px;
+        }
+        
+        .doctor-info .specialization {
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .doctor-info .qualification {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .doctor-body {
+            padding: 20px 25px;
+        }
+        
+        .doctor-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .doctor-detail {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .doctor-detail i {
+            width: 35px;
+            height: 35px;
+            background: var(--off-white);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+        }
+        
+        .doctor-detail span {
+            font-size: 0.9rem;
+        }
+        
+        .doctor-rating {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 0;
+            border-top: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 15px;
+        }
+        
+        .stars {
+            color: #f59e0b;
+        }
+        
+        .rating-text {
+            font-weight: 600;
+        }
+        
+        .review-count {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .doctor-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .doctor-actions .btn {
+            flex: 1;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 80px 40px;
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .no-results i {
+            font-size: 5rem;
+            color: var(--light-gray);
+            margin-bottom: 25px;
+        }
+        
+        .no-results h3 {
+            margin-bottom: 15px;
+        }
+        
+        .no-results p {
+            color: var(--text-light);
+            margin-bottom: 25px;
+        }
+        
+        .specialization-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .specialization-tag {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: var(--radius-full);
+            color: var(--white);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.9rem;
+        }
+        
+        .specialization-tag:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input-group {
+                min-width: 100%;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <div style="padding: 120px 30px 50px;">
+        <div class="search-container">
+            <!-- Search Hero -->
+            <div class="search-hero">
+                <h1><i class="fas fa-user-md"></i> Find the Right Doctor</h1>
+                <p>Search through our verified healthcare professionals and book your appointment</p>
+                
+                <form class="search-box" method="GET" action="{{ url_for('search_doctors') }}">
+                    <div class="search-input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" name="specialization" placeholder="Search by specialization (e.g., Cardiology, Dermatology)">
+                    </div>
+                    <div class="search-input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" name="location" placeholder="Location or Hospital">
+                    </div>
+                    <button type="submit" class="btn btn-secondary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                </form>
+                
+                <div class="specialization-tags">
+                    <span class="specialization-tag" onclick="searchSpec('General Medicine')">General Medicine</span>
+                    <span class="specialization-tag" onclick="searchSpec('Cardiology')">Cardiology</span>
+                    <span class="specialization-tag" onclick="searchSpec('Dermatology')">Dermatology</span>
+                    <span class="specialization-tag" onclick="searchSpec('Neurology')">Neurology</span>
+                    <span class="specialization-tag" onclick="searchSpec('Pediatrics')">Pediatrics</span>
+                    <span class="specialization-tag" onclick="searchSpec('Orthopedics')">Orthopedics</span>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="results-header">
+                <h2><i class="fas fa-user-md"></i> Available Doctors</h2>
+                <span class="results-count">{{ doctors|length }} Doctor{{ doctors|length != 1 }}s Found</span>
+            </div>
+            
+            {% if doctors %}
+            <div class="doctors-grid">
+                {% for doctor in doctors %}
+                <div class="doctor-card">
+                    <div class="doctor-header">
+                        <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop" alt="Dr. {{ doctor.first_name }} {{ doctor.last_name }}" class="doctor-avatar">
+                        <div class="doctor-info">
+                            <h3>Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h3>
+                            <p class="specialization">{{ doctor.specialization }}</p>
+                            <p class="qualification">{{ doctor.qualification if doctor.qualification else '' }}</p>
+                        </div>
+                    </div>
+                    <div class="doctor-body">
+                        <div class="doctor-details">
+                            <div class="doctor-detail">
+                                <i class="fas fa-briefcase"></i>
+                                <span>{{ doctor.experience }} years exp.</span>
+                            </div>
+                            <div class="doctor-detail">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>${{ doctor.consultation_fee or '0' }} / visit</span>
+                            </div>
+                            {% if doctor.hospital %}
+                            <div class="doctor-detail">
+                                <i class="fas fa-hospital"></i>
+                                <span>{{ doctor.hospital.name[:20] }}...</span>
+                            </div>
+                            {% endif %}
+                            <div class="doctor-detail">
+                                <i class="fas fa-check-circle" style="color: var(--secondary-color);"></i>
+                                <span>{% if doctor.is_available %}Available{% else %}Unavailable{% endif %}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="doctor-rating">
+                            <span class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </span>
+                            <span class="rating-text">4.8</span>
+                            <span class="review-count">(124 reviews)</span>
+                        </div>
+                        
+                        {% if doctor.bio %}
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                            {{ doctor.bio[:100] }}{{ '...' if doctor.bio|length > 100 else '' }}
+                        </p>
+                        {% endif %}
+                        
+                        <div class="doctor-actions">
+                            <a href="{{ url_for('book_appointment') }}" class="btn btn-primary">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </a>
+                            <a href="#" class="btn btn-outline">
+                                <i class="fas fa-info-circle"></i> View Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="fas fa-user-md"></i>
+                <h3>No Doctors Found</h3>
+                <p>We couldn't find any doctors matching your search criteria. Try different keywords or browse by specialization.</p>
+                <a href="{{ url_for('search_doctors') }}" class="btn btn-primary">
+                    <i class="fas fa-redo"></i> View All Doctors
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function searchSpec(specialization) {
+            const inputs = document.querySelectorAll('.search-input-group input');
+            inputs[0].value = specialization;
+            inputs[0].closest('form').submit();
+        }
+    </script>
+</body>
+</html>
+

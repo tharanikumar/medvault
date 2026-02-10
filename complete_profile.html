@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Profile - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .profile-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+        
+        .profile-header {
+            background: var(--primary-gradient);
+            padding: 40px;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .profile-header i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .profile-header h1 {
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+        
+        .profile-header p {
+            opacity: 0.9;
+        }
+        
+        .profile-body {
+            padding: 40px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section-title {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row-single {
+            grid-template-columns: 1fr;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .profile-image-upload {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--off-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            border: 4px solid var(--primary-light);
+            overflow: hidden;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .image-preview i {
+            font-size: 3rem;
+            color: var(--medium-gray);
+        }
+        
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background: var(--off-white);
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all var(--transition-fast);
+        }
+        
+        .upload-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 119, 182, 0.05);
+        }
+        
+        .upload-btn input {
+            display: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--off-white);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .checkbox-item:hover {
+            background: rgba(0, 119, 182, 0.05);
+        }
+        
+        .checkbox-item input {
+            accent-color: var(--primary-color);
+        }
+        
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .progress-step {
+            width: 100px;
+            text-align: center;
+        }
+        
+        .progress-step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: 600;
+            color: var(--medium-gray);
+            background: var(--off-white);
+            border: 2px solid var(--light-gray);
+            transition: all var(--transition-normal);
+        }
+        
+        .progress-step.active .progress-step-icon {
+            background: var(--primary-gradient);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+        
+        .progress-step.completed .progress-step-icon {
+            background: var(--secondary-color);
+            color: var(--white);
+            border-color: var(--secondary-color);
+        }
+        
+        .progress-step-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .progress-line {
+            width: 80px;
+            height: 3px;
+            background: var(--light-gray);
+            margin-bottom: 25px;
+        }
+        
+        .progress-line.active {
+            background: var(--secondary-color);
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <div class="profile-container" style="padding: 120px 20px 50px;">
+        <div class="profile-card">
+            <div class="profile-header">
+                {% if user_type == 'patient' %}
+                <i class="fas fa-user-plus"></i>
+                <h1>Complete Your Profile</h1>
+                <p>Help us know you better for personalized healthcare</p>
+                {% elif user_type == 'doctor' %}
+                <i class="fas fa-user-md"></i>
+                <h1>Complete Doctor Profile</h1>
+                <p>Set up your professional profile for patients to find you</p>
+                {% elif user_type == 'hospital' %}
+                <i class="fas fa-hospital"></i>
+                <h1>Complete Hospital Profile</h1>
+                <p>Set up your hospital profile for better patient engagement</p>
+                {% endif %}
+            </div>
+            
+            <div class="profile-body">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" style="margin-bottom: 20px;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- Patient Profile Form -->
+                    {% if user_type == 'patient' %}
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="fas fa-user"></i> Personal Information
+                        </h3>
+                        
+                        <div class="profile-image-upload">
+                            <div class="image-preview">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <label class="upload-btn">
+                                <i class="fas fa-camera"></i> Upload Photo
+                                <input type="file" name="profile_image" accept="image/*">
+                            </label>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" name="first_name" 
+                                       value="{{ patient.first_name if patient else '' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" name="last_name" 
+                                       value="{{ patient.last_name if patient else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="date_of_birth"
+                                       value="{{ patient.date_of_birth if patient and patient.date_of_birth else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Gender</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="male" {% if patient and patient.gender == 'male' %}selected{% endif %}>Male</option>
+                                    <option value="female" {% if patient and patient.gender == 'female' %}selected{% endif %}>Female</option>
+                                    <option value="other" {% if patient and patient.gender == 'other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" 
+                                   value="{{ patient.phone if patient else '' }}" 
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" name="address" rows="3" 
+                                      placeholder="Enter your full address">{{ patient.address if patient else '' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="fas fa-heartbeat"></i> Medical Information
+                        </h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Blood Group</label>
+                                <select class="form-control" name="blood_group">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+" {% if patient and patient.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                                    <option value="A-" {% if patient and patient.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                                    <option value="B+" {% if patient and patient.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                                    <option value="B-" {% if patient and patient.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                                    <option value="AB+" {% if patient and patient.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                                    <option value="AB-" {% if patient and patient.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                                    <option value="O+" {% if patient and patient.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                                    <option value="O-" {% if patient and patient.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Emergency Contact</label>
+                                <input type="tel" class="form-control" name="emergency_contact" 
+                                       value="{{ patient.emergency_contact if patient else '' }}"
+                                       placeholder="Name & Phone Number">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Allergies</label>
+                            <textarea class="form-control" name="allergies" rows="3" 
+                                      placeholder="List any allergies (medications, food, etc.)">{{ patient.allergies if patient else '' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    {% elif user_type == 'doctor' %}
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="fas fa-user-md"></i> Professional Information
+                        </h3>
+                        
+                        <div class="profile-image-upload">
+                            <div class="image-preview">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <label class="upload-btn">
+                                <i class="fas fa-camera"></i> Upload Photo
+                                <input type="file" name="profile_image" accept="image/*">
+                            </label>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" class="form-control" name="first_name" 
+                                       value="{{ doctor.first_name if doctor else '' }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" name="last_name" 
+                                       value="{{ doctor.last_name if doctor else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Specialization *</label>
+                            <select class="form-control" name="specialization" required>
+                                <option value="">Select Specialization</option>
+                                <option value="General Medicine" {% if doctor and doctor.specialization == 'General Medicine' %}selected{% endif %}>General Medicine</option>
+                                <option value="Cardiology" {% if doctor and doctor.specialization == 'Cardiology' %}selected{% endif %}>Cardiology</option>
+                                <option value="Dermatology" {% if doctor and doctor.specialization == 'Dermatology' %}selected{% endif %}>Dermatology</option>
+                                <option value="Neurology" {% if doctor and doctor.specialization == 'Neurology' %}selected{% endif %}>Neurology</option>
+                                <option value="Orthopedics" {% if doctor and doctor.specialization == 'Orthopedics' %}selected{% endif %}>Orthopedics</option>
+                                <option value="Pediatrics" {% if doctor and doctor.specialization == 'Pediatrics' %}selected{% endif %}>Pediatrics</option>
+                                <option value="Psychiatry" {% if doctor and doctor.specialization == 'Psychiatry' %}selected{% endif %}>Psychiatry</option>
+                                <option value="Ophthalmology" {% if doctor and doctor.specialization == 'Ophthalmology' %}selected{% endif %}>Ophthalmology</option>
+                                <option value="ENT" {% if doctor and doctor.specialization == 'ENT' %}selected{% endif %}>ENT</option>
+                                <option value="Gynecology" {% if doctor and doctor.specialization == 'Gynecology' %}selected{% endif %}>Gynecology</option>
+                                <option value="General Surgery" {% if doctor and doctor.specialization == 'General Surgery' %}selected{% endif %}>General Surgery</option>
+                                <option value="Other" {% if doctor and doctor.specialization == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Qualifications</label>
+                                <input type="text" class="form-control" name="qualification" 
+                                       value="{{ doctor.qualification if doctor else '' }}"
+                                       placeholder="MBBS, MD, etc.">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Years of Experience</label>
+                                <input type="number" class="form-control" name="experience" 
+                                       value="{{ doctor.experience if doctor else '' }}"
+                                       placeholder="0" min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" name="phone" 
+                                   value="{{ doctor.phone if doctor else '' }}"
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Consultation Fee ($)</label>
+                            <input type="number" class="form-control" name="consultation_fee" 
+                                   value="{{ doctor.consultation_fee if doctor else '' }}"
+                                   placeholder="0.00" min="0" step="0.01">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Associated Hospital</label>
+                            <select class="form-control" name="hospital_id">
+                                <option value="">Select Hospital (Optional)</option>
+                                {% for hospital in hospitals %}
+                                <option value="{{ hospital.id }}" {% if doctor and doctor.hospital_id == hospital.id %}selected{% endif %}>
+                                    {{ hospital.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Bio</label>
+                            <textarea class="form-control" name="bio" rows="4" 
+                                      placeholder="Tell patients about yourself, your experience, and approach to healthcare">{{ doctor.bio if doctor else '' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    {% elif user_type == 'hospital' %}
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="fas fa-hospital"></i> Hospital Information
+                        </h3>
+                        
+                        <div class="profile-image-upload">
+                            <div class="image-preview">
+                                <i class="fas fa-hospital"></i>
+                            </div>
+                            <label class="upload-btn">
+                                <i class="fas fa-camera"></i> Upload Logo
+                                <input type="file" name="logo" accept="image/*">
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Hospital Name *</label>
+                            <input type="text" class="form-control" name="name" 
+                                   value="{{ hospital.name if hospital else '' }}" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Address *</label>
+                            <textarea class="form-control" name="address" rows="3" required
+                                      placeholder="Enter full address">{{ hospital.address if hospital else '' }}</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" name="phone" 
+                                       value="{{ hospital.phone if hospital else '' }}"
+                                       placeholder="+1 (555) 123-4567" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Emergency Number</label>
+                                <input type="tel" class="form-control" name="emergency_number" 
+                                       value="{{ hospital.emergency_number if hospital else '' }}"
+                                       placeholder="For emergencies">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Website</label>
+                            <input type="url" class="form-control" name="website" 
+                                   value="{{ hospital.website if hospital else '' }}"
+                                   placeholder="https://www.example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="4" 
+                                      placeholder="Describe your hospital, services, and facilities">{{ hospital.description if hospital else '' }}</textarea>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary btn-block btn-lg">
+                        <i class="fas fa-check"></i> Complete Profile
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image preview functionality
+        document.querySelector('.upload-btn input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.querySelector('.image-preview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
+

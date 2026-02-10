@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .auth-container {
+            max-width: 450px;
+        }
+        
+        .otp-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            outline: none;
+            transition: all var(--transition-fast);
+        }
+        
+        .otp-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 119, 182, 0.1);
+        }
+        
+        .timer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.95rem;
+            color: var(--text-light);
+        }
+        
+        .timer span {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .resend-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .resend-btn:hover {
+            text-decoration: underline;
+        }
+        
+        .resend-btn.disabled {
+            color: var(--medium-gray);
+            cursor: not-allowed;
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 25px;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .security-badge i {
+            color: var(--secondary-color);
+        }
+        
+        .otp-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .otp-info i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .otp-info h3 {
+            margin-bottom: 10px;
+        }
+        
+        .otp-info p {
+            color: var(--text-light);
+        }
+        
+        .otp-info .email {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .verification-progress {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .verification-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--light-gray);
+            transition: all var(--transition-fast);
+        }
+        
+        .verification-dot.filled {
+            background: var(--primary-color);
+        }
+        
+        .verification-dot.error {
+            background: var(--error-color);
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div style="margin-bottom: 15px;">
+                    <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="60" height="60" rx="15" fill="rgba(255,255,255,0.2)"/>
+                        <path d="M30 15C23 15 18 20 18 27C18 34 23 39 30 39C37 39 42 34 42 27C42 20 37 15 30 15Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M30 24V33M25.5 30H34.5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h1>Verify Your Email</h1>
+                <p>Enter the OTP sent to your email</p>
+            </div>
+            
+            <div class="auth-body">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}" style="margin-bottom: 20px;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <!-- OTP Info -->
+                <div class="otp-info">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <h3>Check Your Email</h3>
+                    <p>We've sent a verification code to<br><span class="email">{{ email }}</span></p>
+                </div>
+
+                {% if demo_otp %}
+                    <div class="alert alert-info" style="text-align:center; margin: 10px 0;">
+                        Demo OTP: <strong>{{ demo_otp }}</strong>
+                    </div>
+                {% endif %}
+                
+                <!-- Verification Progress -->
+                <div class="verification-progress">
+                    <div class="verification-dot" id="dot0"></div>
+                    <div class="verification-dot" id="dot1"></div>
+                    <div class="verification-dot" id="dot2"></div>
+                    <div class="verification-dot" id="dot3"></div>
+                    <div class="verification-dot" id="dot4"></div>
+                    <div class="verification-dot" id="dot5"></div>
+                </div>
+                
+                <form id="otpForm" method="POST" action="{{ url_for('verify_otp') }}">
+                    <input type="hidden" name="action" value="verify_otp">
+                    
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0">
+                        <input type="text" class="otp-input" maxlength="1" data-index="1">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                    </div>
+                    
+                    <input type="hidden" name="otp" id="otpValue">
+                    
+                    <div class="timer">
+                        Time remaining: <span id="timer">10:00</span>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-check-circle"></i> Verify OTP
+                    </button>
+                    
+                    <a class="resend-btn" id="resendBtn" onclick="resendOTP()">
+                        Didn't receive OTP? Resend
+                    </a>
+                </form>
+                
+                <!-- Security Badge -->
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Your data is protected with enterprise-grade security</span>
+                </div>
+                
+                <p style="text-align: center; margin-top: 25px;">
+                    <a href="{{ url_for('login') }}" style="color: var(--text-light);">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const otpInputs = document.querySelectorAll('.otp-input');
+        const otpForm = document.getElementById('otpForm');
+        const resendBtn = document.getElementById('resendBtn');
+        
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function() {
+                // Update progress dots
+                updateProgressDots();
+                
+                if (this.value.length === 1) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+                updateOTPValue();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '') {
+                    if (index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                }
+            });
+            
+            // Only allow numbers
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+            
+            // Add error animation
+            input.addEventListener('animationend', function() {
+                this.classList.remove('error');
+            });
+        });
+        
+        function updateProgressDots() {
+            otpInputs.forEach((input, index) => {
+                const dot = document.getElementById('dot' + index);
+                if (input.value) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+        
+        function updateOTPValue() {
+            let otp = '';
+            otpInputs.forEach(input => otp += input.value);
+            document.getElementById('otpValue').value = otp;
+        }
+        
+        // Form submission
+        otpForm.addEventListener('submit', function(e) {
+            const otp = document.getElementById('otpValue').value;
+            
+            if (otp.length !== 6) {
+                e.preventDefault();
+                otpInputs.forEach(input => {
+                    if (!input.value) {
+                        input.classList.add('error');
+                    }
+                });
+                alert('Please enter the complete 6-digit OTP.');
+                return;
+            }
+        });
+        
+        // Timer functionality
+        let timerInterval;
+        let timeLeft = 600; // 10 minutes in seconds
+        
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 600;
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').textContent = 'Expired';
+                    document.getElementById('timer').style.color = 'var(--error-color)';
+                    resendBtn.classList.remove('disabled');
+                    resendBtn.style.pointerEvents = 'auto';
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function resendOTP() {
+            if (timeLeft > 0) return;
+            
+            // Simulate resend
+            alert('OTP has been resent to your email. Check your inbox or console for the OTP (demo mode).');
+            
+            // Reset timer
+            startTimer();
+            resendBtn.classList.add('disabled');
+            resendBtn.style.pointerEvents = 'none';
+            
+            // Clear inputs
+            otpInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('error');
+            });
+            updateProgressDots();
+        }
+        
+        // Initialize
+        startTimer();
+        resendBtn.classList.add('disabled');
+        resendBtn.style.pointerEvents = 'none';
+        otpInputs[0].focus();
+    </script>
+</body>
+</html>
+

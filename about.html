@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="45" height="45" rx="10" fill="url(#grad1)"/>
+                    <path d="M22.5 12C17.5 12 13.5 16 13.5 21C13.5 26 17.5 30 22.5 30C27.5 30 31.5 26 31.5 21C31.5 16 27.5 12 22.5 12Z" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22.5 18V24M19.5 21H25.5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0077B6"/>
+                            <stop offset="100%" style="stop-color:#00D9A5"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span>MedVault</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="{{ url_for('welcome') }}#home" class="nav-link">Home</a></li>
+                <li><a href="{{ url_for('welcome') }}#about" class="nav-link active">About</a></li>
+                <li><a href="{{ url_for('welcome') }}#features" class="nav-link">Features</a></li>
+                <li><a href="{{ url_for('welcome') }}#contact" class="nav-link">Contact</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <a href="{{ url_for('login') }}" class="btn btn-outline">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="hero" style="min-height: 50vh; padding-top: 120px;">
+        <div class="container">
+            <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <span class="hero-badge">About MedVault</span>
+                <h1 style="font-size: 3rem; margin: 25px 0;">Transforming Healthcare Through Technology</h1>
+                <p style="font-size: 1.2rem; color: var(--text-light); line-height: 1.8;">
+                    We're on a mission to make healthcare management simpler, more accessible, and secure for everyone.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="section">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+                <div>
+                    <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=500&fit=crop" 
+                         alt="Our Mission" 
+                         style="border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); width: 100%;">
+                </div>
+                <div>
+                    <h2 style="margin-bottom: 25px;">Our Mission</h2>
+                    <p style="color: var(--text-light); margin-bottom: 20px; line-height: 1.8;">
+                        At MedVault, we believe that everyone deserves access to their own health information. Founded in 2024, we've been working tirelessly to create a platform that empowers patients to take control of their healthcare journey.
+                    </p>
+                    <p style="color: var(--text-light); margin-bottom: 30px; line-height: 1.8;">
+                        Our digital health platform bridges the gap between patients and healthcare providers, making it easier than ever to manage appointments, store medical records, and communicate with doctors.
+                    </p>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary-color); font-size: 1.2rem;"></i>
+                            <span>Patient-Centered Design</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary-color); font-size: 1.2rem;"></i>
+                            <span>Secure & Private</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-check-circle" style="color: var(--secondary-color); font-size: 1.2rem;"></i>
+                            <span>Easy to Use</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <h3>500K+</h3>
+                    <p>Active Users</p>
+                </div>
+                <div class="stat-item">
+                    <h3>10K+</h3>
+                    <p>Healthcare Professionals</p>
+                </div>
+                <div class="stat-item">
+                    <h3>500+</h3>
+                    <p>Partner Hospitals</p>
+                </div>
+                <div class="stat-item">
+                    <h3>2M+</h3>
+                    <p>Appointments Booked</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Core Values</h2>
+                <p>The principles that guide everything we do</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Privacy First</h3>
+                    <p>Your health data is yours alone. We use industry-leading encryption to keep your information secure.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-hand-holding-heart"></i>
+                    </div>
+                    <h3>Patient Empowerment</h3>
+                    <p>We believe in giving patients access to their health information and the tools to manage it.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Collaboration</h3>
+                    <p>Seamless communication between patients and healthcare providers improves outcomes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Innovation</h3>
+                    <p>Continuously improving our platform with the latest technology and user feedback.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>Trust</h3>
+                    <p>Building trust through transparency, security, and excellent service.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3>Accessibility</h3>
+                    <p>Making healthcare management available to everyone, regardless of location.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="section" style="background: var(--off-white);">
+        <div class="container">
+            <div class="section-title">
+                <h2>Meet Our Team</h2>
+                <p>The passionate people behind MedVault</p>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 50px;">
+                <div style="text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&h=300&fit=crop" 
+                         alt="CEO" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 4px solid var(--primary-color);">
+                    <h3>John Smith</h3>
+                    <p style="color: var(--primary-color); font-weight: 500;">CEO & Founder</p>
+                </div>
+                <div style="text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop" 
+                         alt="CTO" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 4px solid var(--primary-color);">
+                    <h3>Sarah Johnson</h3>
+                    <p style="color: var(--primary-color); font-weight: 500;">CTO</p>
+                </div>
+                <div style="text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop" 
+                         alt="CMO" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 4px solid var(--primary-color);">
+                    <h3>Michael Chen</h3>
+                    <p style="color: var(--primary-color); font-weight: 500;">Chief Medical Officer</p>
+                </div>
+                <div style="text-align: center;">
+                    <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop" 
+                         alt="COO" 
+                         style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; border: 4px solid var(--primary-color);">
+                    <h3>Emily Davis</h3>
+                    <p style="color: var(--primary-color); font-weight: 500;">COO</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Healthcare Experience?</h2>
+            <p>Join thousands of users who trust MedVault for their healthcare management needs.</p>
+            <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-user-plus"></i> Create Free Account
+                </a>
+                <a href="{{ url_for('welcome') }}#contact" class="btn btn-outline btn-lg" style="border-color: white; color: white;">
+                    <i class="fas fa-envelope"></i> Contact Us
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>MedVault</h3>
+                    <p>Your trusted partner in healthcare management. Securely store, manage, and share your medical records with ease.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="{{ url_for('welcome') }}">Home</a></li>
+                        <li><a href="{{ url_for('welcome') }}#about">About Us</a></li>
+                        <li><a href="{{ url_for('welcome') }}#features">Features</a></li>
+                        <li><a href="{{ url_for('welcome') }}#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>For Users</h4>
+                    <ul>
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <li><a href="{{ url_for('register') }}">Register</a></li>
+                        <li><a href="{{ url_for('search_doctors') }}">Find Doctors</a></li>
+                        <li><a href="{{ url_for('book_appointment') }}">Book Appointment</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Healthcare Ave, NY 10001</a></li>
+                        <li><a href="#"><i class="fas fa-envelope"></i> support@medvault.com</a></li>
+                        <li><a href="#"><i class="fas fa-phone"></i> +1 (555) 123-4567</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 MedVault. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="position: fixed; top: 100px; right: 20px; z-index: 3000;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" style="margin-bottom: 10px; min-width: 300px;">
+                {{ message }}
+                <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; float: right; margin-left: 10px;">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

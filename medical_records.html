@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Records - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .page-header {
+            background: var(--white);
+            padding: 30px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .page-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .page-header h1 i {
+            color: var(--primary-color);
+        }
+        
+        .records-filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 10px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            cursor: pointer;
+            min-width: 150px;
+        }
+        
+        .records-container {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        
+        .records-header {
+            padding: 20px 25px;
+            background: var(--primary-gradient);
+            color: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .records-header h2 {
+            color: var(--white);
+            margin: 0;
+        }
+        
+        .record-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all var(--transition-normal);
+        }
+        
+        .record-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .record-icon {
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--white);
+        }
+        
+        .record-icon.prescription { background: linear-gradient(135deg, #0077B6, #00a8e8); }
+        .record-icon.lab_result { background: linear-gradient(135deg, #00D9A5, #00b088); }
+        .record-icon.scan { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .record-icon.report { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .record-icon.default { background: linear-gradient(135deg, #64748b, #475569); }
+        
+        .record-content {
+            padding: 20px;
+        }
+        
+        .record-content h4 {
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .record-content p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .record-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--light-gray);
+        }
+        
+        .record-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .record-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .record-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-md);
+            transition: all var(--transition-fast);
+            color: var(--text-light);
+        }
+        
+        .record-btn:hover {
+            background: var(--off-white);
+            color: var(--primary-color);
+        }
+        
+        .record-btn.delete:hover {
+            background: #fee2e2;
+            color: var(--error-color);
+        }
+        
+        .upload-zone {
+            border: 3px dashed var(--light-gray);
+            border-radius: var(--radius-xl);
+            padding: 60px 40px;
+            text-align: center;
+            transition: all var(--transition-normal);
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 119, 182, 0.02);
+        }
+        
+        .upload-zone i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .upload-zone h3 {
+            margin-bottom: 10px;
+        }
+        
+        .upload-zone p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+        
+        .record-type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .type-prescription { background: rgba(0, 119, 182, 0.1); color: #0077B6; }
+        .type-lab_result { background: rgba(0, 217, 165, 0.1); color: #00D9A5; }
+        .type-scan { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
+        .type-report { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <div style="padding: 120px 30px 50px; max-width: 1400px; margin: 0 auto;">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>
+                <i class="fas fa-folder-medical"></i>
+                {% if mode == 'patient' %}
+                My Medical Records
+                {% elif mode == 'doctor' %}
+                Patient Records
+                {% else %}
+                Medical Records
+                {% endif %}
+            </h1>
+            
+            {% if mode == 'patient' %}
+            <a href="{{ url_for('upload_record') }}" class="btn btn-primary">
+                <i class="fas fa-upload"></i> Upload Record
+            </a>
+            {% endif %}
+        </div>
+        
+        <!-- Filters -->
+        <div style="margin-bottom: 25px;">
+            <div class="records-filters">
+                <select class="filter-select" onchange="filterRecords(this.value)">
+                    <option value="">All Types</option>
+                    <option value="prescription">Prescriptions</option>
+                    <option value="lab_result">Lab Results</option>
+                    <option value="scan">Scans & Imaging</option>
+                    <option value="report">Reports</option>
+                </select>
+                
+                <select class="filter-select">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+                
+                <input type="text" class="form-control" placeholder="Search records..." style="max-width: 250px;">
+            </div>
+        </div>
+        
+        <!-- Records Grid -->
+        {% if mode == 'patient' %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+            {% if records %}
+            {% for record in records %}
+            <div class="record-card" data-type="{{ record.record_type }}">
+                <div class="record-icon {{ record.record_type }}">
+                    {% if record.record_type == 'prescription' %}
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                    {% elif record.record_type == 'lab_result' %}
+                    <i class="fas fa-flask"></i>
+                    {% elif record.record_type == 'scan' %}
+                    <i class="fas fa-x-ray"></i>
+                    {% else %}
+                    <i class="fas fa-file-alt"></i>
+                    {% endif %}
+                </div>
+                <div class="record-content">
+                    <span class="record-type-badge type-{{ record.record_type }}">
+                        {{ record.record_type.replace('_', ' ') }}
+                    </span>
+                    <h4 style="margin-top: 10px;">{{ record.title }}</h4>
+                    <p>{{ record.description[:80] if record.description else 'No description' }}</p>
+                    <div class="record-meta">
+                        <span class="record-date">
+                            <i class="fas fa-calendar-alt" style="margin-right: 5px;"></i>
+                            {{ record.record_date.strftime('%b %d, %Y') }}
+                        </span>
+                        <div class="record-actions">
+                            {% if record.file_path %}
+                            <a href="{{ url_for('download_record', record_id=record.id) }}" class="record-btn" title="Download">
+                                <i class="fas fa-download"></i>
+                            </a>
+                            {% endif %}
+                            <a href="#" class="record-btn" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="#" class="record-btn delete" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div style="grid-column: 1 / -1;">
+                <div class="upload-zone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>No Medical Records Yet</h3>
+                    <p>Upload your first medical record to keep all your health documents in one secure place.</p>
+                    <a href="{{ url_for('upload_record') }}" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload Your First Record
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="records-container">
+            <div class="records-header">
+                <h2>Available Records</h2>
+                <span>{{ records|length }} Records</span>
+            </div>
+            <div style="padding: 40px; text-align: center;">
+                <i class="fas fa-file-medical-alt" style="font-size: 4rem; color: var(--light-gray); margin-bottom: 20px;"></i>
+                <h3>Records Shared With You</h3>
+                <p style="color: var(--text-light);">Medical records that patients have shared with you will appear here.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div style="position: fixed; top: 100px; right: 20px; z-index: 3000;">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" style="margin-bottom: 10px; min-width: 300px;">
+                {{ message }}
+                <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; float: right; margin-left: 10px;">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
+
+    <script>
+        function filterRecords(type) {
+            const cards = document.querySelectorAll('.record-card');
+            
+            cards.forEach(card => {
+                if (type === '' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Auto-hide flash messages
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Record - MedVault</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .upload-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .upload-card {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+        
+        .upload-header {
+            background: var(--primary-gradient);
+            padding: 40px;
+            text-align: center;
+            color: var(--white);
+        }
+        
+        .upload-header i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .upload-header h1 {
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+        
+        .upload-header p {
+            opacity: 0.9;
+        }
+        
+        .upload-body {
+            padding: 40px;
+        }
+        
+        .dropzone {
+            border: 3px dashed var(--light-gray);
+            border-radius: var(--radius-xl);
+            padding: 50px 30px;
+            text-align: center;
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+        
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: var(--primary-color);
+            background: rgba(0, 119, 182, 0.02);
+        }
+        
+        .dropzone i {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .dropzone h3 {
+            margin-bottom: 10px;
+        }
+        
+        .dropzone p {
+            color: var(--text-light);
+            margin-bottom: 15px;
+        }
+        
+        .dropzone .browse-btn {
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .file-preview {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: var(--off-white);
+            border-radius: var(--radius-lg);
+            margin-bottom: 25px;
+        }
+        
+        .file-preview.active {
+            display: flex;
+        }
+        
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-gradient);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-info h4 {
+            margin-bottom: 5px;
+        }
+        
+        .file-info p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        .file-remove {
+            width: 35px;
+            height: 35px;
+            background: #fee2e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--error-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .file-remove:hover {
+            background: var(--error-color);
+            color: var(--white);
+        }
+        
+        .upload-tips {
+            background: var(--off-white);
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 25px;
+        }
+        
+        .upload-tips h4 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-tips ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .upload-tips li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+        
+        .upload-tips li i {
+            color: var(--secondary-color);
+        }
+        
+        .progress-bar {
+            display: none;
+            height: 6px;
+            background: var(--light-gray);
+            border-radius: 3px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        
+        .progress-bar.active {
+            display: block;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            width: 0;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+        
+        @media (max-width: 600px) {
+            .upload-tips ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard">
+    <div style="padding: 120px 30px 50px;">
+        <div class="upload-container">
+            <div class="upload-card">
+                <div class="upload-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h1>Upload Medical Record</h1>
+                    <p>Securely store and manage your health documents</p>
+                </div>
+                
+                <div class="upload-body">
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}" style="margin-bottom: 20px;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                        <!-- Dropzone -->
+                        <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h3>Drag & Drop your file here</h3>
+                            <p>or <span class="browse-btn">browse</span> from your computer</p>
+                            <p style="font-size: 0.85rem;">Supported formats: PDF, JPG, PNG, DOC (Max 16MB)</p>
+                            <input type="file" id="fileInput" name="file" style="display: none;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                        </div>
+                        
+                        <!-- File Preview -->
+                        <div class="file-preview" id="filePreview">
+                            <div class="file-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="file-info">
+                                <h4 id="fileName">filename.pdf</h4>
+                                <p id="fileSize">2.5 MB</p>
+                            </div>
+                            <div class="file-remove" onclick="removeFile()">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-bar" id="progressBar">
+                            <div class="progress-bar-fill" id="progressFill"></div>
+                        </div>
+                        
+                        <!-- Record Details -->
+                        <div class="form-group">
+                            <label class="form-label">Record Title *</label>
+                            <input type="text" class="form-control" name="title" placeholder="e.g., Blood Test Results 2024" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Record Type *</label>
+                            <select class="form-control" name="record_type" required>
+                                <option value="">Select Record Type</option>
+                                <option value="prescription">Prescription</option>
+                                <option value="lab_result">Lab Result</option>
+                                <option value="scan">Scan / Imaging</option>
+                                <option value="report">Medical Report</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" name="description" rows="4" 
+                                      placeholder="Add any additional details about this record..."></textarea>
+                        </div>
+                        
+                        <!-- Upload Tips -->
+                        <div class="upload-tips">
+                            <h4><i class="fas fa-lightbulb" style="color: var(--warning-color);"></i> Upload Tips</h4>
+                            <ul>
+                                <li><i class="fas fa-check"></i> Ensure documents are clearly legible</li>
+                                <li><i class="fas fa-check"></i> Include date on the document</li>
+                                <li><i class="fas fa-check"></i> File size under 16MB</li>
+                                <li><i class="fas fa-check"></i> PDF, JPG, PNG formats supported</li>
+                            </ul>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-upload"></i> Upload Record
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        
+        // Drag and drop events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.add('dragover');
+            });
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.remove('dragover');
+            });
+        });
+        
+        dropzone.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+        
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+        
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                filePreview.classList.add('active');
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function removeFile() {
+            fileInput.value = '';
+            filePreview.classList.remove('active');
+        }
+        
+        // Form submission with progress
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            if (fileInput.files.length === 0) {
+                e.preventDefault();
+                alert('Please select a file to upload.');
+                return;
+            }
+            
+            // Show progress bar (for demo purposes)
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.classList.add('active');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        });
+    </script>
+</body>
+</html>
+
